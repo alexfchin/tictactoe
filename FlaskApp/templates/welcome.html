@@ -1,0 +1,92 @@
+<!doctype html>
+<html>
+    <head>
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+        
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    </head>
+<title>tictac</title>
+<h1>Welcome {{request.form.name}} {{date}}</h1>
+
+<p id="tictactoe"> </p>
+<p id="tick"> </p>
+
+<script>
+
+var ttt={'winner': ' ', 'grid': [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ']};
+
+
+function Print(){
+var x=" ";
+var i=0;
+
+x+="<table border =1>";
+x+="<tr>";
+for (i = 0; i < 3; i++) {
+    x += "<td id="+i+">";
+    if(ttt.grid[i]===" "){
+    x+="<button  onClick=change("+i+")>_</button>";
+    }else{
+    x+=ttt.grid[i];
+    }
+    x+= "</td>";
+}
+x+="</tr>";
+x+="<tr>";
+for (i = 3; i < 6; i++) {
+  x += "<td id="+i+">";
+    if(ttt.grid[i]===" "){
+    x+="<button  onClick=change("+i+")>_</button>";
+    }else{
+    x+=ttt.grid[i];
+    }
+    x+= "</td>";
+}
+x+="</tr>";
+x+="<tr>";
+for (i = 6; i < 9; i++) {  
+    x += "<td id="+i+">";
+    if(ttt.grid[i]===" "){
+    x+="<button  onClick=change("+i+")>_</button>";
+    }else{
+    x+=ttt.grid[i];
+    }
+    x+= "</td>";
+}
+x+="</tr>";
+x+="</table>";
+x+="<hr>";
+if(ttt.winner !=' '){
+x+="Winner: "+ttt.winner;
+}
+
+document.getElementById("tictactoe").innerHTML = x;
+}
+
+window.onload=Print();
+
+
+function change(id){
+
+ttt.grid[id]='O';
+
+$.ajax({
+url: '/ttt/play',
+type: 'POST',
+dataType:"json",
+data: JSON.stringify(ttt),
+contentType: "application/json",
+success:function(response){
+
+ttt=response;
+
+Print();
+
+}
+})
+}
+
+</script>
+
+
+</html> 
