@@ -1,17 +1,17 @@
 import  datetime
 from flask import Flask, render_template, request, jsonify
 from flask_restful import Resource, Api, reqparse
-from flask_pymongo import PyMongo #Interact w/ DB
+from pymongo import MongoClient
 
-app.config['MONGO_DBNAME'] = 'ttt' #Connect to db: ttt
-app.config['MONGO_URI'] = 'mongodb://localhost:27017/ttt'
-mongo = PyMongo(app)
-
+client = MongoClient()
+db = client.ttt #specify db name
+accounts = db.accounts
 
 app = Flask(__name__)
 api=Api(app)
 
-
+new_user = {"username": "John", "password": "pass", "email": "john@gmail.com"} 
+user_id = accounts.insert_one(new_user).inserted_id
 
 tictactoe={ 'winner' : ' ', 
             'grid' :[' ',' ',' ',' ',' ',' ',' ',' ',' ']
@@ -83,15 +83,11 @@ def ticktack():
 #need to get form data from sign up, create json object, send to db
 @app.route("/adduser", methods=['POST'])
 def adduser():
-    accounts = mongo.db.accounts
-    form = request.get_json() #make json dict obj
-    name = form['name']
-    passwd = form['pass']
-    email = form['email']
-    acc_id = accounts.insert({'username': name, 'password': passwd, 'email': email})
-    new_acc = accounts.find_one({'_id':acc_id})
-    output = {'username':new_acc['name'], 'password':new_acc['password'], 'email': new_acc['email']}
-    return jsonify({'result' : output})
+    new_user = {"username": "John", "password": "pass", "email": "john@gmail.com"} 
+    user_id = db.insert_one(new_user).inserted_id
+    print(db.collection_names(include_system_collections=False)[u'db'])
+    return user_id
+
 
 
 if __name__ == "__main__":
