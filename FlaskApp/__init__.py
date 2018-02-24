@@ -1,12 +1,21 @@
+import  datetime
 from flask import Flask, render_template, request, jsonify
 from flask_restful import Resource, Api, reqparse
-import  datetime
+from flask_pymongo import PyMongo #Interact w/ DB
+
+app.config['MONGO_DBNAME'] = 'ttt' #Connect to db: ttt
+app.config['MONGO_URI'] = 'mongodb://localhost:27017/ttt'
+mongo = PyMongo(app)
+
+
 app = Flask(__name__)
 api=Api(app)
 
+
+
 tictactoe={ 'winner' : ' ', 
             'grid' :[' ',' ',' ',' ',' ',' ',' ',' ',' ']
-}
+            }
 def checkWin(ttt):
     if ttt['grid'][0]==ttt['grid'][1] and ttt['grid'][0]==ttt['grid'][2] and (ttt['grid'][0]=="O" or ttt['grid'][0]=="X"):
         ttt['winner']= ttt['grid'][0]
@@ -26,7 +35,6 @@ def checkWin(ttt):
         ttt['winner']= ttt['grid'][2]
     
     return ttt
-
 def compMove(ttt):
     if ttt['grid'][4] == ' ':
         ttt['grid'][4] = 'X' 
@@ -70,6 +78,21 @@ def ticktack():
     ttt= compMove(ttt)
     ttt= checkWin(ttt)
     return jsonify(ttt)
+
+#Add User to DB
+#need to get form data from sign up, create json object, send to db
+@app.route("/adduser", methods=['POST'])
+def adduser():
+    accounts = mongo.db.accounts
+    form = request.get_json() #make json dict obj
+    name = form['name']
+    passwd = form['pass']
+    email = form['email']
+    acc_id = accounts.insert({'username': name, 'password': passwd, 'email': email})
+    new_acc = accounts.find_one({'_id':acc_id})
+    output = {'username':new_acc['name'], 'password':new_acc['password'], 'email': new_acc['email']}
+    return jsonify({'result' : output})
+
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000)
