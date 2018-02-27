@@ -68,13 +68,13 @@ window.onload=Print();
 
 function change(id){
 
-ttt.grid[id]='O';
+move=id
 
 $.ajax({
 url: '/ttt/play',
 type: 'POST',
 dataType:"json",
-data: JSON.stringify(ttt),
+data: JSON.stringify(move),
 contentType: "application/json",
 success:function(response){
 

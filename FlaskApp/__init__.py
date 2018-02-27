@@ -1,4 +1,5 @@
 import  datetime
+import sendmail
 from flask import Flask, render_template, request, jsonify
 from flask_restful import Resource, Api, reqparse
 from pymongo import MongoClient
@@ -10,12 +11,14 @@ accounts = db.accounts
 app = Flask(__name__)
 api=Api(app)
 
-new_user = {"username": "John", "password": "pass", "email": "john@gmail.com"} 
-user_id = accounts.insert_one(new_user).inserted_id
+#new_user = {"username": "John", "password": "pass", "email": "john@gmail.com"} 
+#user_id = accounts.insert_one(new_user).inserted_id
 
 tictactoe={ 'winner' : ' ', 
             'grid' :[' ',' ',' ',' ',' ',' ',' ',' ',' ']
             }
+def putMove(id):
+    
 def checkWin(ttt):
     if ttt['grid'][0]==ttt['grid'][1] and ttt['grid'][0]==ttt['grid'][2] and (ttt['grid'][0]=="O" or ttt['grid'][0]=="X"):
         ttt['winner']= ttt['grid'][0]
@@ -58,6 +61,7 @@ def compMove(ttt):
 
 @app.route("/ttt/",  methods=['GET'])
 def start_page():
+    sendmail.send('iiacherry@aim.com')
     return render_template('ttt.html')
 
 @app.route("/ttt/", methods=['POST'])
