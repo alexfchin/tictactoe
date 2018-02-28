@@ -19,34 +19,35 @@
 
 		<!-- Sign up form -->
 		<h2>Sign Up</h2>
-		<form action="/ttt/" method="POST" id="form">
-		    <input type="text" name="name" required="required" placeholder="Username">
-		    <input type="text" name="pass" required="required" placeholder="Password">    
+
+		    <input type="text" name="username" required="required" placeholder="Username">
+		    <input type="text" name="password" required="required" placeholder="Password">    
 		   	<input type="text" name="email" required="required" placeholder="Email">    
-			<input class="sign_up" type="submit" value="Submit" onClick= add_user()>
-		</form> 
+			<input  type="button" value="Submit" onClick= add_user()>
+		
 
 		<!-- Sign in form -->
 		<h2>Sign In</h2>
-		<form action="/ttt/" method="POST" id="form">
+
 		    <input type="text" name="name" required="required" placeholder="Username">
 		    <input type="text" name="pass" required="required" placeholder="Password">    
-			<input class="sign_in" type="submit" value="Submit" onClick=sign_in()>
-		</form> 
+			<input  type="button" value="Submit" onClick=sign_in()>
+	
 		
 
 <script>
 function add_user(){
-
+var j= {'username':' ','password':' ','email':' '}
 			
 					//post var for create user  
-					var name = $('#name').val();
-					var pass = $('#pass').val();
-					var email = $('#email').val();
+					j.username = $('#username').val();
+					j.password = $('#password').val();
+					j.email = $('#email').val();
+alert(j);
 					$.ajax({
 						url: '/adduser',
 						dataType: 'json'
-						data: JSON.stringify(name),
+						data: JSON.stringify(j),
 						type: 'POST',
 						success: function(response){
 							alert(response);
@@ -55,13 +56,15 @@ function add_user(){
 				})
 			})
 function sign_in(){
-					//post var for create user  
-					var name = $('#name').val();
-					var pass = $('#pass').val();
+var j= {'username':' ','password':' '}					
+//post var for create user  
+					j.username = $('#username').val();
+					j.password = $('#password').val();
+alert(j);
 					$.ajax({
 						url: '/login',
 						dataType: 'json'
-						data: JSON.stringify(name),
+						data: JSON.stringify(j),
 						type: 'POST',
 						success: function(response){
 							alert(response);

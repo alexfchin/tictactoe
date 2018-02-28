@@ -18,6 +18,6 @@ def send(address,name,key):
     # re-identify ourselves as an encrypted connection
     mailserver.ehlo()
     mailserver.login('csecloud356@gmail.com', 'tictactoe')
-    mailserver.sendmail('csecloud356@gmail.com','iiacherry@aim.com',msg.as_string())
+    mailserver.sendmail('csecloud356@gmail.com',address,msg.as_string())
     mailserver.quit()
 

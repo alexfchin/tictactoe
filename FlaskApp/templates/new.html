@@ -19,19 +19,56 @@
 		<h1>hi</h1>
 		<!-- Sign up form -->
 		<h2>Sign Up</h2>
-        <form id="form-signup" action="{{ url_for('adduser') }}"" method="post" role="form">
-		    <input type="text" name="name" required="required" placeholder="Username">
-		    <input type="text" name="pass" required="required" placeholder="Password">    
-		   	<input type="text" name="email" required="required" placeholder="Email">    
-			<input class="sign_up" type="submit" value="Submit">
-		</form> 
+
+		    <input type="text" id="username" required="required" placeholder="Username">
+		    <input type="text" id="password" required="required" placeholder="Password">    
+		   	<input type="text" id="email" required="required" placeholder="Email">    
+		<button onClick=addUser()>Sign up</Button>
 
 		<!-- Sign in form -->
 		<h2>Sign In</h2>
-		<form id = "form-login" action="{{ url_for('login') }}" method="POST" id="form-signin" role="form">
-		    <input type="text" name="name" required="required" placeholder="Username">
-		    <input type="text" name="pass" required="required" placeholder="Password">    
-			<input class="login" type="submit" value="Submit">
-		</form> 
-	</body>
-</html> 
+
+		    <input type="text" id="name" required="required" placeholder="Username">
+		    <input type="text" id="pass" required="required" placeholder="Password">    
+			<button onClick=sign_in()>Log In</Button>
+
+<script>
+function addUser(){
+//alert("add");
+var j= {'username':' ','password':' ','email':' '};
+j.username = $('#username').val();
+j.password = $('#password').val();
+j.email = $('#email').val();
+//alert(JSON.stringify(j));
+$.ajax({
+url: '/adduser',
+type: 'POST',
+dataType: 'json',
+data: JSON.stringify(j),
+contentType: "application/json",
+success: function(response){
+	//alert(JSON.stringify(response));
+	}
+})
+}
+function sign_in(){
+//alert("sign");
+var j= {'username':' ','password':' '};
+j.username = $('#name').val();
+j.password = $('#pass').val();
+//alert(JSON.stringify(j));
+$.ajax({
+url: '/login',
+type: 'POST',
+dataType: 'json',
+data: JSON.stringify(j),
+contentType: "application/json",
+success: function(response){
+	//alert(JSON.stringify(response));
+	}
+})
+}
+
+</script>
+</body>
+</html>
