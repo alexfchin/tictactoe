@@ -16,10 +16,10 @@
 	</head>
 	<body>
 		<h1>Tic-Tac-Toe</h1>
-
+		<h1>hi</h1>
 		<!-- Sign up form -->
 		<h2>Sign Up</h2>
-        <form id="form-signup" action="/adduser" method="post" role="form">
+        <form id="form-signup" action="{{ url_for('adduser') }}"" method="post" role="form">
 		    <input type="text" name="name" required="required" placeholder="Username">
 		    <input type="text" name="pass" required="required" placeholder="Password">    
 		   	<input type="text" name="email" required="required" placeholder="Email">    
@@ -33,23 +33,5 @@
 		    <input type="text" name="pass" required="required" placeholder="Password">    
 			<input class="login" type="submit" value="Submit">
 		</form> 
-		<script>
-			$(function(){
-				$('login').click(function(){
-					var name = $('#name').val();
-					var pass = $('#pass').val();
-					$.ajax({
-						url: '/login',
-						dataType: 'json'
-						data: JSON.stringify(name),
-						type: 'POST',
-						success: function(response){
-							console.log(response);
-						}
-					})
-				})
-			})
-		</script>
-		
 	</body>
 </html> 

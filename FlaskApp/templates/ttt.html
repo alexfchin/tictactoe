@@ -23,7 +23,7 @@
 		    <input type="text" name="name" required="required" placeholder="Username">
 		    <input type="text" name="pass" required="required" placeholder="Password">    
 		   	<input type="text" name="email" required="required" placeholder="Email">    
-			<input class="sign_up" type="submit" value="Submit">
+			<input class="sign_up" type="submit" value="Submit" onClick= add_user()>
 		</form> 
 
 		<!-- Sign in form -->
@@ -31,43 +31,40 @@
 		<form action="/ttt/" method="POST" id="form">
 		    <input type="text" name="name" required="required" placeholder="Username">
 		    <input type="text" name="pass" required="required" placeholder="Password">    
-			<input class="sign_in" type="submit" value="Submit">
+			<input class="sign_in" type="submit" value="Submit" onClick=sign_in()>
 		</form> 
 		
-<!-- SIGN UP JS -->
-		<script>
-			$(function(){
-				$('sign_up').click(function(){
+
+<script>
+function add_user(){
+
+			
 					//post var for create user  
 					var name = $('#name').val();
 					var pass = $('#pass').val();
 					var email = $('#email').val();
 					$.ajax({
-						url: '/ttt/',
+						url: '/adduser',
 						dataType: 'json'
 						data: JSON.stringify(name),
 						type: 'POST',
 						success: function(response){
-							console.log(response);
+							alert(response);
 						}
 					})
 				})
 			})
-		</script>
-<!-- SIGN IN JS -->
-		<script>
-			$(function(){
-				$('sign_up').click(function(){
+function sign_in(){
 					//post var for create user  
 					var name = $('#name').val();
 					var pass = $('#pass').val();
 					$.ajax({
-						url: '/ttt/',
+						url: '/login',
 						dataType: 'json'
 						data: JSON.stringify(name),
 						type: 'POST',
 						success: function(response){
-							console.log(response);
+							alert(response);
 						}
 					})
 				})

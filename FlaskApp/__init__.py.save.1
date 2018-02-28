@@ -1,5 +1,6 @@
 import  datetime
-from flask import Flask, render_template, request, jsonify, redirect, url_for
+import sendmail
+from flask import Flask, render_template, request, jsonify
 from flask_restful import Resource, Api, reqparse
 from pymongo import MongoClient
 
@@ -10,11 +11,13 @@ accounts = db.accounts
 app = Flask(__name__)
 api=Api(app)
 
-
+#new_user = {"username": "John", "password": "pass", "email": "john@gmail.com"} 
+#user_id = accounts.insert_one(new_user).inserted_id
 
 tictactoe={ 'winner' : ' ', 
             'grid' :[' ',' ',' ',' ',' ',' ',' ',' ',' ']
             }
+
 def checkWin(ttt):
     if ttt['grid'][0]==ttt['grid'][1] and ttt['grid'][0]==ttt['grid'][2] and (ttt['grid'][0]=="O" or ttt['grid'][0]=="X"):
         ttt['winner']= ttt['grid'][0]
@@ -55,48 +58,46 @@ def compMove(ttt):
         ttt['grid'][5] = 'X' 
     return ttt
 
-@app.route("/ttt/", methods=['GET','POST'])
+@app.route("/ttt/",  methods=['GET'])
 def start_page():
-    if request.method == 'POST' and request.form['email'] is not None: #signup form
-        return redirect(url_for('adduser'))
-    elif request.method == 'POST' and request.form['email'] is None: #login
-        return redirect(url_for('login'))
-    else:
-        return render_template('new.html')
-# @app.route("/ttt/", methods=['POST'])
-# def welcome_page():
-#     date = str(datetime.datetime.now())[:10]
-#     return render_template("welcome.html",  date = date) 
+#    sendmail.send('iiacherry@aim.com', 'HELLo')
+    return render_template('new.html')
+
+@app.route("/ttt/", methods=['POST'])
+def welcome_page():
+    date = str(datetime.datetime.now())[:10]
+    return render_template("welcome.html",  date = date) 
+
+@app.route("/ttt/tictac", methods=['GET'])
+def tictac():
+    return render_template('tictac',ttt=tictactoe)
 
 @app.route("/ttt/play", methods=['POST'])
 def ticktack():
-    ttt = request.get_json()
-    ttt = checkWin(ttt)
-    if 'winner' in ttt and ttt['winner']!=' ':
-        return jsonify(ttt)
-    ttt= compMove(ttt)
-    ttt= checkWin(ttt)
-    return jsonify(ttt)
-
+    #ttt = request.get_json()
+   # ttt = checkWin(ttt)
+   # if 'winner' in ttt and ttt['winner']!=' ':
+   #     return jsonify(ttt)
+   # ttt= compMove(ttt)
+    #ttt= checkWin(ttt)
+    return jsonify(request.get_json())
+@app.route("/login", methods=['GET','POST'])
+def login():
+    sendmail.send('iiacherry@aim.com', 'login')
+    return 'hi'
 #Add User to DB
 #need to get form data from sign up, create json object, send to db
-@app.route("/adduser", methods=['POST'])
+@app.route("/adduser", methods=['GET','POST'])
 def adduser():
-    un = str(request.form.get('name'))
-    pw = str(request.form.get('pass'))
-    mail = str(request.form.get('email'))
+    un = request.form['username']
+    pw = request.form['password']
+    mail = request.form['email']
     new_user = {"username": un, "password": pw, "email": mail} 
     user_id = accounts.insert_one(new_user).inserted_id
-    if db.accounts.find_one({"email": "john@gmail.com"}):
-        return render_template('welcome.html')
+    if db.accounts.find_one({"email": mail}):
+        return json.dumps({'status':'OK'})
+    data = {"status": "ERROR"}
     return render_template('new.html')
-    
-@app.route('/login', methods=['POST'])
-def login():
-    # if db.acccounts.find_one({"username": "John", "password": "pass"}):
-    #     return render_template('new.html')
-    return render_template('welcome.html')
-
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000)
