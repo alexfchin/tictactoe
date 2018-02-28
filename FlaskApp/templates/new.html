@@ -35,40 +35,47 @@
 <script>
 function addUser(){
 //alert("add");
-var j= {'username':' ','password':' ','email':' '};
-j.username = $('#username').val();
-j.password = $('#password').val();
-j.email = $('#email').val();
-//alert(JSON.stringify(j));
-$.ajax({
-url: '/adduser',
-type: 'POST',
-dataType: 'json',
-data: JSON.stringify(j),
-contentType: "application/json",
-success: function(response){
-	//alert(JSON.stringify(response));
-	}
-})
+	var j= {'username':' ','password':' ','email':' '};
+	j.username = $('#username').val();
+	j.password = $('#password').val();
+	j.email = $('#email').val();
+	//alert(JSON.stringify(j));
+	$.ajax({
+	url: '/adduser',
+	type: 'POST',
+	dataType: 'json',
+	data: JSON.stringify(j),
+	contentType: "application/json",
+	success: function(response){
+		//alert(JSON.stringify(response));
+		}
+	})
 }
 function sign_in(){
-//alert("sign");
-var j= {'username':' ','password':' '};
-j.username = $('#name').val();
-j.password = $('#pass').val();
-//alert(JSON.stringify(j));
-$.ajax({
-url: '/login',
-type: 'POST',
-dataType: 'json',
-data: JSON.stringify(j),
-contentType: "application/json",
-success: function(response){
-	//alert(JSON.stringify(response));
-	}
-})
+	//alert("sign");
+	var j= {'username':' ','password':' '};
+	j.username = $('#name').val();
+	j.password = $('#pass').val();
+	//alert(JSON.stringify(j));
+	$.ajax({
+		url: '/login',
+		type: 'POST',
+		dataType: 'json',
+		data: JSON.stringify(j),
+		contentType: "application/json",
+		success: function(response){
+			if(response.status === "OK"){
+				window.location.assign("http://130.245.168.39/play")
+			}
+			else if(response.status === "ERROR"){
+				alert("Invalid login information")
+			}
+			else{
+				alert(resonse.status)
+			}
+		}
+	})
 }
-
 </script>
 </body>
 </html>

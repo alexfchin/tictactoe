@@ -84,19 +84,16 @@ def ticktack():
 #need to get form data from sign up, create json object, send to db
 @app.route("/adduser", methods=['POST'])
 def adduser():
-    #return jsonify(request.get_json())
     user=request.get_json()
-    #un = str(request.form.get('username'))
     un=user['username']
-    #pw = str(request.form.get('password'))
     pw=user['password']
-    #mail = str(request.form.get('email'))
     mail=user['email']
     ky= keygen.gen()
     new_user = {"username": un, "password": pw, "email": mail, "key":ky} 
     user_id = accounts.insert_one(new_user).inserted_id
     sendmail.send(mail,un,ky)
     return jsonify({"username": un, "password": pw, "email": mail, "key":ky,"status":"OK"})
+
 @app.route("/verify", methods=['POST','GET'])
 def verify():
     #sendmail.send("iiacherry@aim.com", "veriifying")
@@ -108,9 +105,7 @@ def verify():
             return render_template('verify.html')
     else:
         user=request.get_json()
-        #email= str(request.form.get('email'))
         email=user['email']
-        #key= str(request.form.get('key'))
         key=user['key']
     if db.accounts.find_one({"email":email}) is not None and key=="abracadabra":
         db.accounts.update_many({"email":email},{'$set':{'verified':'true'}})
@@ -124,18 +119,23 @@ def verify():
 @app.route('/login', methods=['POST'])
 def login():
     attempt= request.get_json()
-    #un = str(request.form.get('name'))
     un=attempt['username']
-    #pw = str(request.form.get('pass'))
     pw=attempt['password']
     if db.accounts.find_one({"username": un, "password": pw, "verified":"true"}) is not None:
 #PUT COOKIE STUFF IN HERE PLS
-       # return render_template('welcome.html')
         return jsonify({"status":"OK"})
     else:
        # return "Please check your username/ password or verify your account @ /verify"  
         return jsonify({"status":"ERROR"})
 
+@app.route('/logout', methods=['POST'])
+def logout():
+    return render_template('new.html')
+
+
+@app.route('/play', methods=['GET'])
+def play():
+    return render_template('welcome.html')
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000)

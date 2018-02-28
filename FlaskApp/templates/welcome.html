@@ -10,7 +10,7 @@
 
 <p id="tictactoe"> </p>
 <p id="tick"> </p>
-
+<button onclick="logout()">Logout</button>
 <script>
 
 var ttt={'winner': ' ', 'grid': [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ']};
@@ -84,6 +84,19 @@ Print();
 
 }
 })
+}
+
+function logout(){
+    $.ajax({
+    url: '/logout',
+    type: 'POST',
+    dataType: 'json',
+    data: JSON.stringify(j),
+    contentType: "application/json",
+    success: function(response){
+        //alert(JSON.stringify(response));
+        }
+    })
 }
 
 </script>
