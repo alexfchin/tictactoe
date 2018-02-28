@@ -2,13 +2,13 @@ import smtplib
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEText import MIMEText
 
-def send(address,txt):
+def send(address,name,key):
     msg = MIMEMultipart()
     msg['From'] = 'csecloud356@gmail.com'
     msg['To'] = address
     msg['Subject'] = 'test email'
-    message = ' click this to verify your account on /ttt :)'
-    message+= txt
+    message = 'Hello ' +name+' click this to verify your account on /ttt :)\n'
+    message+= "130.245.168.39/verify?email="+address+"&key="+key
     msg.attach(MIMEText(message))
     mailserver = smtplib.SMTP('smtp.gmail.com',587)
     # identify ourselves to smtp gmail client

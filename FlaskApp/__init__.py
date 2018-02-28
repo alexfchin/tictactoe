@@ -1,4 +1,6 @@
 import  datetime
+import sendmail
+import keygen
 from flask import Flask, render_template, request, jsonify, redirect, url_for
 from flask_restful import Resource, Api, reqparse
 from pymongo import MongoClient
@@ -85,17 +87,41 @@ def adduser():
     un = str(request.form.get('name'))
     pw = str(request.form.get('pass'))
     mail = str(request.form.get('email'))
-    new_user = {"username": un, "password": pw, "email": mail} 
+    ky= keygen.gen()
+    new_user = {"username": un, "password": pw, "email": mail, "key":ky} 
     user_id = accounts.insert_one(new_user).inserted_id
-    if db.accounts.find_one({"email": "john@gmail.com"}):
-        return render_template('welcome.html')
-    return render_template('new.html')
+    sendmail.send(mail,un,ky)
+    return render_template('new.html') 
+@app.route("/verify", methods=['POST','GET'])
+def verify():
+    #sendmail.send("iiacherry@aim.com", "veriifying")
+   # return request.args.get('email')+request.args.get('key')
+    if request.method =='GET':
+        email=request.args.get('email')
+        key=request.args.get('key')
+        if email is None or key is None:
+            return render_template('verify.html')
+    else:
+        email= str(request.form.get('email'))
+        key= str(request.form.get('key'))
+    if db.accounts.find_one({"email":email}) is not None and key=="abracadabra":
+        db.accounts.update_many({"email":email},{'$set':{'verified':'true'}})
+        return email+", you have been verified"
+    elif db.accounts.find_one({"email":email, "key":key})is not None:
+        db.accounts.update_one({"email":email, "key":key},{'$set':{'verified':'true'}})
+        return email+", you have been verified"
+    else:
+        return "key or email was invalid"
     
 @app.route('/login', methods=['POST'])
 def login():
-    # if db.acccounts.find_one({"username": "John", "password": "pass"}):
-    #     return render_template('new.html')
-    return render_template('welcome.html')
+    un = str(request.form.get('name'))
+    pw = str(request.form.get('pass'))
+    if db.accounts.find_one({"username": un, "password": pw, "verified":"true"}) is not None:
+#PUT COOKIE STUFF IN HERE PLS
+        return render_template('welcome.html')
+    else:
+        return "Please check your username/ password or verify your account @ /verify"  
 
 
 if __name__ == "__main__":
