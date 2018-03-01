@@ -11,6 +11,8 @@
 <p id="tictactoe"> </p>
 <p id="tick"> </p>
 <button onclick="logout()">Logout</button>
+<button onclick="reset()">RESET</button>
+
 <script>
 var ttt = JSON.parse('{{ ttt | tojson | safe}}');
 
@@ -93,6 +95,33 @@ function logout(){
         window.location.assign("http://130.245.168.39/ttt/")
         }
     })
+}
+
+var re={'reset':'false'};
+function reset(){
+    if(ttt.winner != " "){
+        re={'reset':'true'};
+    }
+    else{
+        re ={'reset': 'true'};
+        for(i = 8; i >= 0; i--){
+            if(ttt.grid[i] === " "){
+                re={'reset': 'false'};
+            }
+        }
+    }
+    
+   $.ajax({
+        url: '/reset',
+        type: 'POST',
+        dataType:"json",
+        data: JSON.stringify(re),
+        contentType: "application/json",
+        success:function(response){
+            ttt=response;
+            Print();
+        }
+    }) 
 }
 </script>
 

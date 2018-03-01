@@ -1,4 +1,5 @@
 import datetime
+import time
 import sendmail
 import keygen
 import tictac
@@ -17,6 +18,9 @@ api=Api(app)
 def start_page(): #session works
     if request.cookies.get('cookiename') is not None:
         un= request.cookies.get('cookiename')
+        if db.current.find_one({"username":un},{"_id":0,"username":1,"id":1,"grid":1,"start_date":1,"winner":1}) is None:
+            default_game = {"username": un, "id": 1, "grid":[' ',' ',' ',' ',' ',' ',' ',' ',' '], "start_date": time.time(),"winner": " "} 
+            new_game = db.current.insert_one(default_game).inserted_id
         ttt=db.current.find_one({"username":un},{"_id":0,"username":1,"id":1,"grid":1,"start_date":1,"winner":1})
         return render_template('welcome.html',ttt=ttt)
     return render_template('new.html')
@@ -103,6 +107,23 @@ def logout():
     return out
 
 
+@app.route('/reset', methods=['POST'])
+def reset():
+    #copy -> update
+    un= request.cookies.get('cookiename')
+    default = request.get_json()
+    re = default['reset']
+    ttt=db.current.find_one({"username":un},{"_id":0,"username":1,"id":1,"grid":1,"start_date":1,"winner":1})
+    old_id = ttt['id']
+    new_id = old_id + 1
+    if re == 'true':
+        db.current.aggregate([{'$match':{'username':un, 'id': old_id}}, {'$out': "history"}])
+        db.current.update_one({'username':un}, {'$set':{'id':new_id,'grid':[' ',' ',' ',' ',' ',' ',' ',' ',' '], "winner": " "}})
+    #update ttt to new board
+    ttt=db.current.find_one({"username":un},{"_id":0,"username":1,"id":1,"grid":1,"start_date":1,"winner":1})
+    return jsonify(ttt) 
+    #out=jsonify({"status":"OK"})
+    #return out
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000)
