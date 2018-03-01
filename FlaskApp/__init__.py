@@ -33,17 +33,16 @@ def ticktack():
     j=request.get_json()
     mv=j['move']
     if ttt['winner']!=" " or mv is None: 
-        return jsonify(ttt) #should stop moves from going through if there is already a winner
+        return reset() #should stop moves from going through if there is already a winner
     if ttt['grid'][mv]!=' ':
-        reset()
+        return reset()
     ttt['grid'][mv]='O' 
     db.current.update_one({"username":un},{'$set':{'grid':ttt['grid']}})
     ttt=tictac.checkWin(ttt)
     if ttt['winner']!=" ":  
         db.current.update_one({"username":un},{'$set':{'winner':ttt['winner']}})
         #think we gotta do a transfer to history/score type of thing 
-        return jsonify(ttt)
-    #i think also check if all grid is filled = tie
+        return reset()    #i think also check if all grid is filled = tie
     ttt=tictac.compMove(ttt)
     ttt=tictac.checkWin(ttt)
     db.current.update_one({"username":un},{'$set':{'winner':ttt['winner'],'grid':ttt['grid']}})
@@ -76,7 +75,7 @@ def verify():
         email=user['email']
         key=user['key']
     if db.accounts.find_one({"email":email}) is not None and key=="abracadabra":
-        db.accounts.update_many({"email":email},{'$set':{'verified':'true'}})
+        db.accounts.update_one({"email":email},{'$set':{'verified':'true'}})
         return jsonify({"status":"OK"})
     elif db.accounts.find_one({"email":email, "key":key})is not None:
         db.accounts.update_one({"email":email, "key":key},{'$set':{'verified':'true'}})
