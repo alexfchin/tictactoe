@@ -22,21 +22,21 @@ def checkWin(ttt):
 
 def compMove(ttt):
     if ttt['grid'][4] == ' ':
-        ttt['grid'][4] = 'X' 
+        ttt['grid'][4] = 'O' 
     elif ttt['grid'][1] == ' ':
-        ttt['grid'][1] = 'X' 
+        ttt['grid'][1] = 'O' 
     elif ttt['grid'][7] == ' ':
-        ttt['grid'][7] = 'X' 
+        ttt['grid'][7] = 'O' 
     elif ttt['grid'][0] == ' ':
-        ttt['grid'][0] = 'X' 
+        ttt['grid'][0] = 'O' 
     elif ttt['grid'][2] == ' ':
-        ttt['grid'][2] = 'X' 
+        ttt['grid'][2] = 'O' 
     elif ttt['grid'][8] == ' ':
-        ttt['grid'][8] = 'X' 
+        ttt['grid'][8] = 'O' 
     elif ttt['grid'][6] == ' ':
-        ttt['grid'][6] = 'X' 
+        ttt['grid'][6] = 'O' 
     elif ttt['grid'][3] == ' ':
-        ttt['grid'][3] = 'X' 
+        ttt['grid'][3] = 'O' 
     elif ttt['grid'][5] == ' ':
-        ttt['grid'][5] = 'X' 
+        ttt['grid'][5] = 'O' 
     return ttt

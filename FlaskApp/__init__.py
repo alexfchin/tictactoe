@@ -18,9 +18,9 @@ api=Api(app)
 def start_page(): #session works
     if request.cookies.get('cookiename') is not None:
         un= request.cookies.get('cookiename')
-        if db.current.find_one({"username":un},{"_id":0,"username":1,"id":1,"grid":1,"start_date":1,"winner":1}) is None:
-            default_game = {"username": un, "id": 1, "grid":[' ',' ',' ',' ',' ',' ',' ',' ',' '], "start_date": time.time(),"winner": " "} 
-            new_game = db.current.insert_one(default_game).inserted_id
+#        if db.current.find_one({"username":un},{"_id":0,"username":1,"id":1,"grid":1,"start_date":1,"winner":1}) is None:
+ #           default_game = {"username": un, "id": 1, "grid":[' ',' ',' ',' ',' ',' ',' ',' ',' '], "start_date": time.time(),"winner": " "} 
+  #          new_game = db.current.insert_one(default_game).inserted_id
         ttt=db.current.find_one({"username":un},{"_id":0,"username":1,"id":1,"grid":1,"start_date":1,"winner":1})
         return render_template('welcome.html',ttt=ttt)
     return render_template('new.html')
@@ -32,22 +32,27 @@ def ticktack():
     ttt=db.current.find_one({"username":un},{"_id":0,"username":1,"id":1,"grid":1,"start_date":1,"winner":1})
     j=request.get_json()
     mv=j['move']
-    if ttt['winner']!=" " or mv is None: 
-        return reset() #should stop moves from going through if there is already a winner
-    if ttt['grid'][mv]!=' ':
+    if ttt['winner']!=" " or mv is None: #none move
+        return jsonify(ttt) #should stop moves from going through if there is already a winner
+    if ttt['grid'][mv]!=' ': #click same spot 
         return reset()
-    ttt['grid'][mv]='O' 
-    db.current.update_one({"username":un},{'$set':{'grid':ttt['grid']}})
+    ttt['grid'][mv]='X' 
+    db.current.update_one({"username":un},{'$set':{'grid':ttt['grid']}}) #change json object grid
     ttt=tictac.checkWin(ttt)
     if ttt['winner']!=" ":  
         db.current.update_one({"username":un},{'$set':{'winner':ttt['winner']}})
-        #think we gotta do a transfer to history/score type of thing 
-        return reset()    #i think also check if all grid is filled = tie
+        #make new default with incremented id 
+        default_game = {"username": un, "id": ttt['id']+1, "grid":[' ',' ',' ',' ',' ',' ',' ',' ',' '], "start_date": time.time(),"winner": " "} 
+        new_game = db.current.insert_one(default_game).inserted_id
+        db.history.insert(ttt);
+        db.current.remove(ttt);
+        #update to default game id++
+        ttt=db.current.find_one({"username":un},{"_id":0,"username":1,"id":1,"grid":1,"start_date":1,"winner":1})
+        return jsonify(ttt)
     ttt=tictac.compMove(ttt)
     ttt=tictac.checkWin(ttt)
     db.current.update_one({"username":un},{'$set':{'winner':ttt['winner'],'grid':ttt['grid']}})
-    return jsonify(ttt)
-#Add User to DB
+    return jsonify(ttt) #Add User to DB
 #need to get form data from sign up, create json object, send to db
 @app.route("/adduser", methods=['POST'])
 def adduser():
@@ -58,6 +63,8 @@ def adduser():
     ky= keygen.gen()
     new_user = {"username": un, "password": pw, "email": mail, "key":ky} 
     user_id = accounts.insert_one(new_user).inserted_id
+    default_game = {"username": un, "id": 1, "grid":[' ',' ',' ',' ',' ',' ',' ',' ',' '], "start_date": time.time(),"winner": " "} 
+    new_game = db.current.insert_one(default_game).inserted_id
     sendmail.send(mail,un,ky)
     return jsonify({"username": un, "password": pw, "email": mail, "key":ky,"status":"OK"})
 
@@ -131,7 +138,7 @@ def listGames():
     if db.history.find({"username":un},{'id':1,'start_date':1,'_id':0}) is None:
 	return jsonify({"status":"ERROR"})
     hist=list(db.history.find({"username":un},{'id':1,'start_date':1,'_id':0}))
-    out= jsonify({"status":"OK", "games":hist})
+    out= jsonify({"games":hist, "status":"OK"})
     return out
 
 @app.route('/getgame',methods=['POST'])
