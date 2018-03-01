@@ -41,12 +41,12 @@ function addUser(){
 	j.email = $('#email').val();
 	//alert(JSON.stringify(j));
 	$.ajax({
-	url: '/adduser',
-	type: 'POST',
-	dataType: 'json',
-	data: JSON.stringify(j),
-	contentType: "application/json",
-	success: function(response){
+		url: '/adduser',
+		type: 'POST',
+		dataType: 'json',
+		data: JSON.stringify(j),
+		contentType: "application/json",
+		success: function(response){
 		//alert(JSON.stringify(response));
 		}
 	})
@@ -65,7 +65,7 @@ function sign_in(){
 		contentType: "application/json",
 		success: function(response){
 			if(response.status === "OK"){
-				window.location.assign("http://130.245.168.39/play")
+				window.location.assign("http://130.245.168.39/ttt/")
 			}
 			else if(response.status === "ERROR"){
 				alert("Invalid login information")
@@ -76,6 +76,7 @@ function sign_in(){
 		}
 	})
 }
+
 </script>
 </body>
 </html>

@@ -1,7 +1,7 @@
 import  datetime
 import sendmail
 import keygen
-from flask import Flask, render_template, request, jsonify, redirect, url_for
+from flask import Flask, render_template, request, jsonify, redirect, url_for, session
 from flask_restful import Resource, Api, reqparse
 from pymongo import MongoClient
 
@@ -58,17 +58,10 @@ def compMove(ttt):
     return ttt
 
 @app.route("/ttt/", methods=['GET','POST'])
-def start_page():
-    #if request.method == 'POST' and request.form['email'] is not None: #signup form
-    #    return redirect(url_for('adduser'))
-   # elif request.method == 'POST' and request.form['email'] is None: #login
-    #    return redirect(url_for('login'))
-   # else:
-        return render_template('new.html')
-# @app.route("/ttt/", methods=['POST'])
-# def welcome_page():
-#     date = str(datetime.datetime.now())[:10]
-#     return render_template("welcome.html",  date = date) 
+def start_page(): #session works
+    if request.cookies.get('cookiename') is not None:
+        return render_template('welcome.html')
+    return render_template('new.html')
 
 @app.route("/ttt/play", methods=['POST'])
 def ticktack():
@@ -122,20 +115,24 @@ def login():
     un=attempt['username']
     pw=attempt['password']
     if db.accounts.find_one({"username": un, "password": pw, "verified":"true"}) is not None:
-#PUT COOKIE STUFF IN HERE PLS
-        return jsonify({"status":"OK"})
+#PUT COOKIE STUFF IN HERE PLs
+       # resp=make_response(render_template('welcome.html'))
+       # resp.set_cookie('cookiename',un)
+        #return jsonify({"status":"OK"})
+        out=jsonify({"status":"OK"})
+        out.set_cookie('cookiename',un)
+        return out
     else:
        # return "Please check your username/ password or verify your account @ /verify"  
         return jsonify({"status":"ERROR"})
 
 @app.route('/logout', methods=['POST'])
 def logout():
-    return render_template('new.html')
+    out=jsonify({"status":"OK"})
+    out.set_cookie('cookiename','',expires=0)
+    return out
 
 
-@app.route('/play', methods=['GET'])
-def play():
-    return render_template('welcome.html')
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000)
