@@ -34,7 +34,8 @@ def ticktack():
     mv=j['move']
     if ttt['winner']!=" " or mv is None: 
         return jsonify(ttt) #should stop moves from going through if there is already a winner
-    
+    if ttt['grid'][mv]!=' ':
+        reset()
     ttt['grid'][mv]='O' 
     db.current.update_one({"username":un},{'$set':{'grid':ttt['grid']}})
     ttt=tictac.checkWin(ttt)
@@ -128,8 +129,18 @@ def reset():
 @app.route('/listgames',methods=['POST'])
 def listGames():
     un= request.cookies.get('cookiename')
+    if db.history.find({"username":un},{'id':1,'start_date':1,'_id':0}) is None:
+	return jsonify({"status":"ERROR"})
     hist=list(db.history.find({"username":un},{'id':1,'start_date':1,'_id':0}))
     out= jsonify({"status":"OK", "games":hist})
+    return out
+
+@app.route('/getgame',methods=['POST'])
+def getgame():
+    un= request.cookies.get('cookiename')
+    game=db.history.find({"username":un, "id": id},{'grid':1,'winner':1, '_id': 0})
+
+    out= jsonify({"status":"OK", "grid": game['grid'], 'winner': game['winner']})
     return out
 
 if __name__ == "__main__":
