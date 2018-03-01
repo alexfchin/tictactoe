@@ -117,13 +117,20 @@ def reset():
     old_id = ttt['id']
     new_id = old_id + 1
     if re == 'true':
-        db.current.aggregate([{'$match':{'username':un, 'id': old_id}}, {'$out': "history"}])
+        history_entry = {"username": un,"id": old_id, "grid": ttt['grid'],"start_date": ttt['start_date'],"winner":ttt['winner']}
+	db.history.insert_one(history_entry).inserted_id 
         db.current.update_one({'username':un}, {'$set':{'id':new_id,'grid':[' ',' ',' ',' ',' ',' ',' ',' ',' '], "winner": " "}})
     #update ttt to new board
     ttt=db.current.find_one({"username":un},{"_id":0,"username":1,"id":1,"grid":1,"start_date":1,"winner":1})
     return jsonify(ttt) 
     #out=jsonify({"status":"OK"})
     #return out
+@app.route('/listgames',methods=['POST'])
+def listGames():
+    un= request.cookies.get('cookiename')
+    hist=list(db.history.find({"username":un},{'id':1,'start_date':1,'_id':0}))
+    out= jsonify({"status":"OK", "games":hist})
+    return out
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000)
