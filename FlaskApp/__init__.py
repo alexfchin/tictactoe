@@ -1,6 +1,7 @@
-import  datetime
+import datetime
 import sendmail
 import keygen
+import tictac
 from flask import Flask, render_template, request, jsonify, redirect, url_for, session
 from flask_restful import Resource, Api, reqparse
 from pymongo import MongoClient
@@ -12,67 +13,29 @@ accounts = db.accounts
 app = Flask(__name__)
 api=Api(app)
 
-
-
-tictactoe={ 'winner' : ' ', 
-            'grid' :[' ',' ',' ',' ',' ',' ',' ',' ',' ']
-            }
-def checkWin(ttt):
-    if ttt['grid'][0]==ttt['grid'][1] and ttt['grid'][0]==ttt['grid'][2] and (ttt['grid'][0]=="O" or ttt['grid'][0]=="X"):
-        ttt['winner']= ttt['grid'][0]
-    elif ttt['grid'][3]==ttt['grid'][4] and ttt['grid'][3]==ttt['grid'][5] and (ttt['grid'][3]=="O" or ttt['grid'][3]=="X"):
-        ttt['winner']= ttt['grid'][3]
-    elif ttt['grid'][6]==ttt['grid'][7] and ttt['grid'][6]==ttt['grid'][8] and (ttt['grid'][6]=="O" or ttt['grid'][6]=="X"):
-        ttt['winner']= ttt['grid'][6]
-    elif ttt['grid'][0]==ttt['grid'][3] and ttt['grid'][0]==ttt['grid'][6] and (ttt['grid'][0]=="O" or ttt['grid'][0]=="X"):
-        ttt['winner']= ttt['grid'][0]
-    elif ttt['grid'][1]==ttt['grid'][4] and ttt['grid'][1]==ttt['grid'][7] and (ttt['grid'][1]=="O" or ttt['grid'][1]=="X"):
-        ttt['winner']= ttt['grid'][1]
-    elif ttt['grid'][2]==ttt['grid'][5] and ttt['grid'][2]==ttt['grid'][8] and (ttt['grid'][2]=="O" or ttt['grid'][2]=="X"):
-        ttt['winner']= ttt['grid'][2]
-    elif ttt['grid'][0]==ttt['grid'][4] and ttt['grid'][0]==ttt['grid'][8] and (ttt['grid'][0]=="O" or ttt['grid'][0]=="X"):
-        ttt['winner']= ttt['grid'][0]
-    elif ttt['grid'][2]==ttt['grid'][4] and ttt['grid'][2]==ttt['grid'][6] and (ttt['grid'][2]=="O" or ttt['grid'][2]=="X"):
-        ttt['winner']= ttt['grid'][2]
-    
-    return ttt
-def compMove(ttt):
-    if ttt['grid'][4] == ' ':
-        ttt['grid'][4] = 'X' 
-    elif ttt['grid'][1] == ' ':
-        ttt['grid'][1] = 'X' 
-    elif ttt['grid'][7] == ' ':
-        ttt['grid'][7] = 'X' 
-    elif ttt['grid'][0] == ' ':
-        ttt['grid'][0] = 'X' 
-    elif ttt['grid'][2] == ' ':
-        ttt['grid'][2] = 'X' 
-    elif ttt['grid'][8] == ' ':
-        ttt['grid'][8] = 'X' 
-    elif ttt['grid'][6] == ' ':
-        ttt['grid'][6] = 'X' 
-    elif ttt['grid'][3] == ' ':
-        ttt['grid'][3] = 'X' 
-    elif ttt['grid'][5] == ' ':
-        ttt['grid'][5] = 'X' 
-    return ttt
-
 @app.route("/ttt/", methods=['GET','POST'])
 def start_page(): #session works
     if request.cookies.get('cookiename') is not None:
-        return render_template('welcome.html')
+        un= request.cookies.get('cookiename')
+        ttt=db.current.find_one({"username":un},{"_id":0,"username":1,"id":1,"grid":1,"start_date":1,"winner":1})
+        return render_template('welcome.html',ttt=ttt)
     return render_template('new.html')
 
 @app.route("/ttt/play", methods=['POST'])
 def ticktack():
-    ttt = request.get_json()
-   # ttt = checkWin(ttt)
+    #return jsonify({"status":"OK"})
+    un= request.cookies.get('cookiename')
+    ttt=db.current.find_one({"username":un},{"_id":0,"username":1,"id":1,"grid":1,"start_date":1,"winner":1})
+    j=request.get_json()
+    mv=j['move']
+    ttt['grid'][mv]='O' 
+    db.current.update_one({"username":un},{'$set':{'grid':ttt['grid']}})
+ # ttt = checkWin(ttt)
    # if 'winner' in ttt and ttt['winner']!=' ':
    #     return jsonify(ttt)
     #ttt= compMove(ttt)
     #ttt= checkWin(ttt)
     return jsonify(ttt)
-
 #Add User to DB
 #need to get form data from sign up, create json object, send to db
 @app.route("/adduser", methods=['POST'])

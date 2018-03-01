@@ -12,8 +12,7 @@
 <p id="tick"> </p>
 <button onclick="logout()">Logout</button>
 <script>
-
-var ttt={'winner': ' ', 'grid': [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ']};
+var ttt = JSON.parse('{{ ttt | tojson | safe}}');
 
 
 function Print(){
@@ -79,7 +78,7 @@ contentType: "application/json",
 success:function(response){
 
 ttt=response;
-alert(response);
+alert(JSON.stringify(response));
 Print();
 
 }
