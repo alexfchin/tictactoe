@@ -28,13 +28,20 @@ def ticktack():
     ttt=db.current.find_one({"username":un},{"_id":0,"username":1,"id":1,"grid":1,"start_date":1,"winner":1})
     j=request.get_json()
     mv=j['move']
+    if ttt['winner']!=" " or mv is None: 
+        return jsonify(ttt) #should stop moves from going through if there is already a winner
+    
     ttt['grid'][mv]='O' 
     db.current.update_one({"username":un},{'$set':{'grid':ttt['grid']}})
- # ttt = checkWin(ttt)
-   # if 'winner' in ttt and ttt['winner']!=' ':
-   #     return jsonify(ttt)
-    #ttt= compMove(ttt)
-    #ttt= checkWin(ttt)
+    ttt=tictac.checkWin(ttt)
+    if ttt['winner']!=" ":  
+        db.current.update_one({"username":un},{'$set':{'winner':ttt['winner']}})
+        #think we gotta do a transfer to history/score type of thing 
+        return jsonify(ttt)
+    #i think also check if all grid is filled = tie
+    ttt=tictac.compMove(ttt)
+    ttt=tictac.checkWin(ttt)
+    db.current.update_one({"username":un},{'$set':{'winner':ttt['winner'],'grid':ttt['grid']}})
     return jsonify(ttt)
 #Add User to DB
 #need to get form data from sign up, create json object, send to db

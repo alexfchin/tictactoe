@@ -18,7 +18,7 @@ var ttt = JSON.parse('{{ ttt | tojson | safe}}');
 function Print(){
 var x=" ";
 var i=0;
-
+x+="GAME ID:"+ttt.id;
 x+="<table border =1>";
 x+="<tr>";
 for (i = 0; i < 3; i++) {
@@ -78,7 +78,7 @@ contentType: "application/json",
 success:function(response){
 
 ttt=response;
-alert(JSON.stringify(response));
+//alert(JSON.stringify(response));
 Print();
 
 }

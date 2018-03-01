@@ -1,6 +1,6 @@
-tictactoe={ 'winner' : ' ', 
-            'grid' :[' ',' ',' ',' ',' ',' ',' ',' ',' ']
-            }
+#tictactoe={ 'winner' : ' ', 
+ #           'grid' :[' ',' ',' ',' ',' ',' ',' ',' ',' ']
+ #           }
 def checkWin(ttt):
     if ttt['grid'][0]==ttt['grid'][1] and ttt['grid'][0]==ttt['grid'][2] and (ttt['grid'][0]=="O" or ttt['grid'][0]=="X"):
         ttt['winner']= ttt['grid'][0]
@@ -18,8 +18,8 @@ def checkWin(ttt):
         ttt['winner']= ttt['grid'][0]
     elif ttt['grid'][2]==ttt['grid'][4] and ttt['grid'][2]==ttt['grid'][6] and (ttt['grid'][2]=="O" or ttt['grid'][2]=="X"):
         ttt['winner']= ttt['grid'][2]
-    
     return ttt
+
 def compMove(ttt):
     if ttt['grid'][4] == ' ':
         ttt['grid'][4] = 'X' 
